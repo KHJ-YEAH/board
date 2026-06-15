@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>컬처 퀘스트 — High-5 Culture Quest 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Pretendard Variable';
+    font-weight: 45 920; font-style: normal; font-display: swap;
+    src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2') format('woff2-variations');
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: #07060A;
+    font-family: 'Space Mono', 'Pretendard Variable', 'Pretendard', monospace;
+  }
+
+  /* ─── keyframes ─── */
+  @keyframes pq-marquee     { from { transform:translateX(0);    } to { transform:translateX(-50%); } }
+  @keyframes pq-marquee-rev { from { transform:translateX(-50%); } to { transform:translateX(0);    } }
+  @keyframes pq-float       { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+  @keyframes pq-flick       { 0%,100%{opacity:.4;} 50%{opacity:.9;} }
+  @keyframes pq-bounce      { 0%,100%{transform:translateY(0);} 50%{transform:translateY(7px);} }
+  @keyframes pq-kw-glow     { 0%,100%{text-shadow:0 0 10px rgba(224,180,255,.55);} 50%{text-shadow:0 0 20px rgba(224,180,255,.95),0 0 34px rgba(180,150,255,.6);} }
+  @keyframes pq-cta-pulse   { 0%,100%{box-shadow:0 8px 28px -8px rgba(150,110,235,.7),inset 0 1px 0 rgba(255,255,255,.25);} 50%{box-shadow:0 12px 40px -6px rgba(170,123,234,.95),0 0 20px rgba(150,110,235,.5),inset 0 1px 0 rgba(255,255,255,.3);} }
+  @keyframes pq-panel-in    { from{opacity:0;transform:scale(.97);} to{opacity:1;transform:scale(1);} }
+
+  @keyframes pq-shoot-dl {
+    0%            { transform:translate(0,0);            opacity:0; }
+    5%            { opacity:0; }
+    6%            { opacity:1; }
+    17%           { transform:translate(-22vw,14vh);     opacity:0; }
+    17.01%, 100%  { transform:translate(-22vw,14vh);     opacity:0; visibility:hidden; }
+  }
+  @keyframes pq-shoot-dr {
+    0%            { transform:translate(0,0);            opacity:0; }
+    5%            { opacity:0; }
+    6%            { opacity:1; }
+    17%           { transform:translate(22vw,14vh);      opacity:0; }
+    17.01%, 100%  { transform:translate(22vw,14vh);      opacity:0; visibility:hidden; }
+  }
+
+  @keyframes pq-title-shine {
+    0%,14%,19%,63%,68%,100% { color:#EAE3D2; text-shadow:0 2px 24px rgba(10,8,20,.7); }
+    16%  { color:#F2EAFF; text-shadow:0 0 2px rgba(255,255,255,.6),0 0 10px rgba(214,190,255,.85),0 0 26px rgba(170,140,245,.7),0 0 50px rgba(150,120,255,.55); }
+    65%  { color:#F2EAFF; text-shadow:0 0 2px rgba(255,255,255,.6),0 0 10px rgba(214,190,255,.85),0 0 26px rgba(170,140,245,.7),0 0 50px rgba(150,120,255,.55); }
+  }
+
+  /* ─── shell: full-width fluid ─── */
+  .pq-shell {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #0C0A10;
+    color: #EAE3D2;
+  }
+
+  /* ─── starfield ─── */
+  .pq-starfield { position:absolute; inset:0; pointer-events:none; z-index:1; }
+  .pq-star      { position:absolute; border-radius:50%; animation:pq-flick ease-in-out infinite; }
+  .pq-shoot     { position:absolute; z-index:1; opacity:0; }
+  .pq-shoot-trail {
+    height:2px; border-radius:2px;
+    background:linear-gradient(90deg,transparent,#fff);
+    box-shadow:0 0 7px rgba(214,176,255,.7);
+  }
+
+  /* ─── grain ─── */
+  .pq-grain {
+    position:absolute; inset:0; z-index:9; pointer-events:none;
+    opacity:.07; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ─── marquee borders ─── */
+  .pq-border-top,.pq-border-bot {
+    position:absolute; left:0; right:0; height:28px;
+    overflow:hidden; z-index:8;
+    display:flex; align-items:center;
+  }
+  .pq-border-top { top:0;    border-bottom:1px solid rgba(234,227,210,.14); }
+  .pq-border-bot { bottom:0; border-top:   1px solid rgba(234,227,210,.14); }
+  .pq-marquee-inner {
+    white-space:nowrap; font-size:10px; letter-spacing:.24em;
+    color:rgba(234,227,210,.55);
+  }
+  .pq-border-left,.pq-border-right {
+    position:absolute; top:28px; bottom:28px; width:26px; z-index:8;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pq-border-left  { left:0;  border-right:1px solid rgba(234,227,210,.14); }
+  .pq-border-right { right:0; border-left: 1px solid rgba(234,227,210,.14); }
+  .pq-vtext { writing-mode:vertical-rl; font-size:9px; letter-spacing:.26em; color:rgba(234,227,210,.4); }
+
+  /* ─── content ─── */
+  .pq-content {
+    position:relative; z-index:4;
+    padding: 52px 48px 44px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+
+  /* ─── title ─── */
+  .pq-title-wrap {
+    position:relative;
+    display:flex; flex-direction:column; align-items:center;
+    margin-top:20px;
+    animation:pq-float 7s ease-in-out infinite;
+  }
+  .pq-title-glow {
+    position:absolute; left:50%; top:50%;
+    width:min(560px,90vw); height:min(320px,50vw);
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:radial-gradient(ellipse,rgba(150,110,235,.22),transparent 66%);
+    filter:blur(28px); z-index:0;
+  }
+  .pq-title-word {
+    position:relative; z-index:3;
+    font-family:'Black Han Sans',sans-serif;
+    font-size:clamp(56px, 11vw, 110px);
+    line-height:.9; color:#EAE3D2; letter-spacing:.02em;
+    text-shadow:0 2px 24px rgba(10,8,20,.7);
+    animation:pq-title-shine 11s ease-in-out infinite;
+  }
+  .pq-title-word + .pq-title-word { margin-top:2px; }
+
+  /* ─── message zone ─── */
+  .pq-msg-zone {
+    margin-top:22px;
+    min-height:80px; max-width:min(640px,90vw);
+    text-align:center;
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  .pq-msg-inner { transition:opacity .3s,transform .4s cubic-bezier(.16,.84,.3,1),filter .3s; }
+  .pq-msg-inner.hidden  { opacity:0; transform:translateY(10px); filter:blur(6px); }
+  .pq-msg-inner.visible { opacity:1; transform:translateY(0);    filter:blur(0); }
+
+  .pq-msg-title-main {
+    font-family:'Pretendard Variable','Pretendard',sans-serif;
+    font-size:clamp(15px,2.4vw,21px); font-weight:600; line-height:1.6; color:#F4EFE2;
+  }
+  .pq-msg-title-sub { color:rgba(234,227,210,.7); font-weight:500; }
+  .pq-arrow-label { margin-top:14px; font-size:11px; letter-spacing:.2em; color:rgba(234,227,210,.6); }
+  .pq-arrow-bounce {
+    margin-top:6px; font-size:26px; line-height:1;
+    color:#FFD400; text-shadow:0 0 14px rgba(255,212,0,.7);
+    animation:pq-bounce 1.3s ease-in-out infinite;
+  }
+
+  .pq-kw-label { display:inline-flex; align-items:center; gap:8px; font-size:11px; letter-spacing:.22em; color:#C8924E; cursor:pointer; }
+  .pq-kw-dot   { width:5px; height:5px; border-radius:50%; background:#C8924E; animation:pq-flick 1.6s ease-in-out infinite; }
+  .pq-kw-msg-text {
+    margin-top:12px;
+    font-family:'Pretendard Variable','Pretendard',sans-serif;
+    font-size:clamp(17px,2.8vw,25px); font-weight:800; line-height:1.5;
+    background:linear-gradient(100deg,#C7A6FF 0%,#E9C8FF 38%,#B8C6FF 72%,#C7A6FF 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    word-break:keep-all;
+  }
+  .pq-kw-hint { margin-top:10px; font-size:10px; letter-spacing:.13em; color:rgba(234,227,210,.4); cursor:pointer; }
+
+  /* ─── keyword catalog ─── */
+  .pq-catalog {
+    margin-top:18px;
+    display:flex; flex-wrap:wrap;
+    justify-content:center; gap:2px 0; align-items:center;
+  }
+  .pq-catalog-sep { color:rgba(234,227,210,.25); padding:0 2px; }
+  .pq-kw-btn {
+    background:none; border:none; cursor:pointer;
+    font-family:inherit; font-size:clamp(12px,1.5vw,15px); font-weight:700;
+    letter-spacing:0; white-space:nowrap;
+    color:#F2D98A; padding:6px 10px;
+    transition:color .2s,transform .2s,text-shadow .2s;
+  }
+  .pq-kw-btn:hover, .pq-kw-btn:focus-visible {
+    color:#E8D0FF; transform:scale(1.1);
+    animation:pq-kw-glow 1.4s ease-in-out infinite;
+    outline:none;
+  }
+  .pq-kw-numeral { color:rgba(242,217,138,.7); margin-right:4px; }
+
+  /* ─── chapter buttons ─── */
+  .pq-chapters { margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .pq-ch-btn {
+    font-family:inherit; font-size:clamp(11px,1.4vw,13.5px); letter-spacing:.07em; font-weight:700;
+    color:#EAE3D2;
+    background:rgba(150,120,235,.14);
+    border:1px solid rgba(186,160,255,.5); border-radius:6px;
+    padding:12px 20px; cursor:pointer;
+    box-shadow:0 6px 20px -8px rgba(150,110,235,.65),inset 0 1px 0 rgba(255,255,255,.12);
+    transition:all .2s;
+  }
+  .pq-ch-btn:hover, .pq-ch-btn:focus-visible {
+    background:rgba(170,140,250,.26); border-color:rgba(214,190,255,.8);
+    transform:translateY(-2px);
+    box-shadow:0 12px 28px -8px rgba(160,120,245,.85),inset 0 1px 0 rgba(255,255,255,.18);
+    outline:none;
+  }
+
+  /* ─── meta ─── */
+  .pq-meta { margin-top:18px; font-size:10px; letter-spacing:.2em; color:rgba(234,227,210,.38); text-align:center; }
+
+  /* ─── CTA ─── */
+  .pq-cta {
+    margin-top:18px;
+    display:inline-flex; align-items:center; gap:9px;
+    padding:13px 36px; border-radius:999px;
+    font-family:'Pretendard Variable','Pretendard',sans-serif;
+    font-size:clamp(14px,1.8vw,16px); font-weight:800; letter-spacing:.01em;
+    color:#fff; text-decoration:none;
+    background:linear-gradient(100deg,#7C5CD6,#A77BEA 50%,#6E8CE0);
+    border:1px solid rgba(214,190,255,.6);
+    animation:pq-cta-pulse 2.6s ease-in-out infinite;
+    transition:transform .2s;
+  }
+  .pq-cta:hover { transform:translateY(-2px); }
+
+  /* ─── info panel overlay ─── */
+  .pq-overlay {
+    display:none; position:fixed; inset:0; z-index:60;
+    align-items:center; justify-content:center;
+    padding:20px;
+    background:rgba(6,5,10,.85);
+    overflow-y:auto;
+  }
+  .pq-overlay.open { display:flex; }
+  .pq-panel {
+    position:relative; width:min(640px,100%);
+    border-radius:4px; padding:28px 24px 26px;
+    background:#141118;
+    border:1px solid rgba(234,227,210,.26);
+    box-shadow:0 32px 80px -24px rgba(0,0,0,.9);
+    animation:pq-panel-in .22s ease;
+    max-height:85vh; overflow-y:auto;
+  }
+  .pq-close {
+    position:sticky; top:0; float:right; clear:right;
+    width:28px; height:28px; border-radius:2px;
+    border:1px solid rgba(234,227,210,.28);
+    background:rgba(20,17,24,.9); color:#EAE3D2;
+    cursor:pointer; font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+    z-index:1;
+  }
+  .pq-panel-eyebrow { font-size:10px; letter-spacing:.26em; color:#C8924E; }
+  .pq-panel-title   { margin:6px 0 0; font-family:'Pretendard Variable','Pretendard',sans-serif; font-weight:700; font-size:22px; color:#EAE3D2; letter-spacing:-.01em; }
+
+  .pq-bg-lead { margin:14px 0 0; font-family:'Pretendard Variable','Pretendard',sans-serif; font-size:14.5px; line-height:1.6; color:#F4EFE2; font-weight:600; }
+  .pq-bg-body { margin:10px 0 0; font-family:'Pretendard Variable','Pretendard',sans-serif; font-size:13.5px; line-height:1.74; color:rgba(234,227,210,.82); }
+  .pq-bg-cta  { margin:10px 0 0; font-family:'Pretendard Variable','Pretendard',sans-serif; font-size:14px; line-height:1.6; color:#C8924E; font-weight:700; }
+  .pq-bg-meta { margin-top:16px; text-align:center; padding:11px; border:1px dashed rgba(234,227,210,.22); border-radius:2px; font-size:12px; letter-spacing:.02em; color:rgba(234,227,210,.7); }
+
+  .pq-mech-steps { margin-top:16px; display:flex; flex-direction:column; gap:7px; font-family:'Pretendard Variable','Pretendard',sans-serif; }
+  .pq-mech-step  { display:flex; gap:12px; align-items:center; padding:11px 14px; border:1px solid rgba(234,227,210,.2); border-radius:2px; }
+  .pq-step-num   { flex-shrink:0; width:46px; text-align:center; }
+  .pq-step-label { font-size:11px; font-weight:800; letter-spacing:.03em; color:#C8924E; white-space:nowrap; }
+  .pq-step-arrow { font-size:22px; line-height:1; color:#C8924E; margin-top:2px; }
+  .pq-step-title { font-size:13px; font-weight:700; color:#EAE3D2; }
+  .pq-step-sub   { font-size:11.5px; color:rgba(234,227,210,.6); margin-top:2px; }
+  .pq-leader-box { margin-top:12px; padding:12px 14px; border:1px solid rgba(234,227,210,.16); border-radius:2px; font-family:'Pretendard Variable','Pretendard',sans-serif; }
+  .pq-leader-header { font-size:10px; letter-spacing:.1em; color:rgba(234,227,210,.5); margin-bottom:7px; }
+  .pq-leader-list   { display:flex; flex-direction:column; gap:4px; font-size:12px; color:rgba(234,227,210,.72); }
+  .pq-leader-tag    { color:#C8924E; font-weight:700; }
+
+  .pq-reward-cards { margin-top:16px; display:flex; gap:8px; font-family:'Pretendard Variable','Pretendard',sans-serif; }
+  .pq-reward-card  { flex:1; padding:16px 8px; border:1px solid rgba(234,227,210,.2); border-radius:2px; text-align:center; }
+  .pq-reward-icon  { font-size:22px; line-height:1; }
+  .pq-reward-p-icon{ width:24px; height:24px; border-radius:50%; background:#C8924E; color:#141118; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; margin:0 auto; }
+  .pq-reward-card-title { font-size:13px; font-weight:700; color:#EAE3D2; margin-top:8px; }
+  .pq-reward-card-body  { font-size:10px; color:rgba(234,227,210,.64); margin-top:7px; line-height:1.8; }
+  .pq-gold { color:#F2D98A; font-weight:700; }
+
+  .pq-panel-content { display:none; }
+  .pq-panel-content.active { display:block; }
+
+  /* ─── mobile breakpoints ─── */
+  @media (max-width: 480px) {
+    .pq-content { padding:44px 32px 38px; }
+    .pq-vtext   { display:none; }  /* 좌우 세로 텍스트 숨김 - 모바일 공간 확보 */
+    .pq-border-left, .pq-border-right { width:16px; }
+    .pq-reward-cards { flex-direction:column; }
+    .pq-panel { padding:22px 16px 20px; }
+    .pq-chapters { gap:8px; }
+    .pq-ch-btn  { font-size:11px; padding:10px 14px; }
+    .pq-kw-btn  { font-size:12px; padding:5px 7px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="pq-shell" id="pq-shell">
+
+  <!-- STARFIELD -->
+  <div class="pq-starfield" aria-hidden="true">
+    <i class="pq-star" style="top:8%;left:12%;width:2px;height:2px;background:#EAE3D2;animation-duration:3.4s;animation-delay:0s"></i>
+    <i class="pq-star" style="top:15%;left:82%;width:2px;height:2px;background:#EAE3D2;animation-duration:3s;animation-delay:.6s"></i>
+    <i class="pq-star" style="top:35%;left:7%;width:1px;height:1px;background:#EAE3D2;animation-duration:3.8s;animation-delay:1.1s"></i>
+    <i class="pq-star" style="top:44%;left:92%;width:2px;height:2px;background:#EAE3D2;animation-duration:3.2s;animation-delay:1.6s"></i>
+    <i class="pq-star" style="top:60%;left:11%;width:1px;height:1px;background:#EAE3D2;animation-duration:2.8s;animation-delay:.3s"></i>
+    <i class="pq-star" style="top:70%;left:87%;width:2px;height:2px;background:#EAE3D2;animation-duration:3.5s;animation-delay:1.3s"></i>
+    <i class="pq-star" style="top:28%;left:50%;width:1px;height:1px;background:#EAE3D2;animation-duration:3s;animation-delay:.9s"></i>
+    <i class="pq-star" style="top:82%;left:38%;width:1px;height:1px;background:#EAE3D2;animation-duration:3.6s;animation-delay:1.8s"></i>
+    <i class="pq-star" style="top:5%;left:28%;width:2px;height:2px;background:#fff;box-shadow:0 0 6px 1px rgba(214,176,255,.8);animation-duration:3.1s;animation-delay:.4s"></i>
+    <i class="pq-star" style="top:14%;left:44%;width:1px;height:1px;background:#E6D5FF;animation-duration:2.7s;animation-delay:1.2s"></i>
+    <i class="pq-star" style="top:8%;left:64%;width:2px;height:2px;background:#fff;box-shadow:0 0 6px 1px rgba(180,160,255,.7);animation-duration:3.4s;animation-delay:.9s"></i>
+    <i class="pq-star" style="top:24%;left:20%;width:1px;height:1px;background:#fff;animation-duration:3s;animation-delay:1.5s"></i>
+    <i class="pq-star" style="top:32%;left:76%;width:2px;height:2px;background:#E6D5FF;box-shadow:0 0 5px 1px rgba(214,176,255,.7);animation-duration:2.9s;animation-delay:.2s"></i>
+    <i class="pq-star" style="top:50%;left:5%;width:1px;height:1px;background:#fff;animation-duration:3.5s;animation-delay:1.1s"></i>
+    <i class="pq-star" style="top:55%;left:94%;width:2px;height:2px;background:#fff;box-shadow:0 0 6px 1px rgba(180,160,255,.7);animation-duration:3.2s;animation-delay:.6s"></i>
+    <i class="pq-star" style="top:65%;left:32%;width:1px;height:1px;background:#E6D5FF;animation-duration:2.8s;animation-delay:1.7s"></i>
+    <i class="pq-star" style="top:75%;left:62%;width:2px;height:2px;background:#fff;box-shadow:0 0 5px 1px rgba(214,176,255,.7);animation-duration:3.3s;animation-delay:.3s"></i>
+    <i class="pq-star" style="top:88%;left:16%;width:1px;height:1px;background:#fff;animation-duration:3s;animation-delay:1.3s"></i>
+    <i class="pq-star" style="top:92%;left:80%;width:2px;height:2px;background:#E6D5FF;box-shadow:0 0 6px 1px rgba(180,160,255,.7);animation-duration:2.6s;animation-delay:.8s"></i>
+    <i class="pq-star" style="top:40%;left:42%;width:1px;height:1px;background:#fff;animation-duration:3.6s;animation-delay:1s"></i>
+    <i class="pq-star" style="top:58%;left:70%;width:1px;height:1px;background:#fff;animation-duration:3.1s;animation-delay:1.9s"></i>
+    <!-- shooting stars -->
+    <div class="pq-shoot" style="top:7%;left:78%;animation:pq-shoot-dl 11s ease-in infinite;animation-delay:0s">
+      <div class="pq-shoot-trail" style="width:clamp(70px,9vw,120px);transform:rotate(140deg)"></div>
+    </div>
+    <div class="pq-shoot" style="top:9%;left:16%;animation:pq-shoot-dr 11s ease-in infinite;animation-delay:5.5s">
+      <div class="pq-shoot-trail" style="width:clamp(64px,8vw,108px);transform:rotate(40deg)"></div>
+    </div>
+  </div>
+
+  <!-- grain -->
+  <div class="pq-grain" aria-hidden="true"></div>
+
+  <!-- MARQUEE BORDERS -->
+  <div class="pq-border-top" aria-hidden="true">
+    <div class="pq-marquee-inner" style="animation:pq-marquee 38s linear infinite">★ HIGH-5 CULTURE QUEST ★ GUIDE OF THE CULTURE ★ 2026 ★ HIGH-5 CULTURE QUEST ★ GUIDE OF THE CULTURE ★ 2026 ★ HIGH-5 CULTURE QUEST ★ GUIDE OF THE CULTURE ★ 2026 ★ HIGH-5 CULTURE QUEST ★ GUIDE OF THE CULTURE ★ 2026 ★ </div>
+  </div>
+  <div class="pq-border-bot" aria-hidden="true">
+    <div class="pq-marquee-inner" style="animation:pq-marquee-rev 38s linear infinite">★ 소통과 인정 ★ 존중과 배려 ★ 칭찬과 격려 ★ 성장과 육성 ★ 협업과 시너지 ★ 소통과 인정 ★ 존중과 배려 ★ 칭찬과 격려 ★ 성장과 육성 ★ 협업과 시너지 ★ 소통과 인정 ★ 존중과 배려 ★ 칭찬과 격려 ★ 성장과 육성 ★ 협업과 시너지 ★ </div>
+  </div>
+  <div class="pq-border-left"  aria-hidden="true"><span class="pq-vtext">ONLINE WORKSHOP · 2026 · ONLINE WORKSHOP</span></div>
+  <div class="pq-border-right" aria-hidden="true"><span class="pq-vtext">HYUNDAI ENGINEERING &amp; CONSTRUCTION</span></div>
+
+  <!-- CONTENT -->
+  <div class="pq-content">
+
+    <!-- title -->
+    <div class="pq-title-wrap" aria-label="컬처 퀘스트">
+      <div class="pq-title-glow" aria-hidden="true"></div>
+      <div class="pq-title-word">컬처</div>
+      <div class="pq-title-word">퀘스트</div>
+    </div>
+
+    <!-- message zone -->
+    <div class="pq-msg-zone" role="region" aria-live="polite" aria-label="키워드 메시지">
+      <div class="pq-msg-inner visible" id="pq-msg-inner">
+        <div id="pq-state-default">
+          <div class="pq-msg-title-main">
+            알고 있는 평범한 가치를 일상에 실천하는 문화<br>
+            <span class="pq-msg-title-sub">다섯 개의 키워드로 시작합니다</span>
+          </div>
+          <div class="pq-arrow-label">아래 키워드를 선택하세요</div>
+          <div class="pq-arrow-bounce" aria-hidden="true">▼</div>
+        </div>
+        <div id="pq-state-msg" style="display:none">
+          <div class="pq-kw-label" id="pq-kw-label" role="button" tabindex="0" aria-label="키워드 닫기">
+            <span class="pq-kw-dot" aria-hidden="true"></span>
+            <span id="pq-active-month"></span> OPEN · <span id="pq-active-name"></span>
+          </div>
+          <div class="pq-kw-msg-text" id="pq-active-msg"></div>
+          <div class="pq-kw-hint" id="pq-kw-hint" role="button" tabindex="0">↺ 다시 누르면 처음으로</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- keyword catalog -->
+    <nav class="pq-catalog" aria-label="조직문화 키워드">
+      <button class="pq-kw-btn" data-idx="0" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅰ</span>소통과 인정</button>
+      <span class="pq-catalog-sep" aria-hidden="true">·</span>
+      <button class="pq-kw-btn" data-idx="1" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅱ</span>존중과 배려</button>
+      <span class="pq-catalog-sep" aria-hidden="true">·</span>
+      <button class="pq-kw-btn" data-idx="2" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅲ</span>칭찬과 격려</button>
+      <span class="pq-catalog-sep" aria-hidden="true">·</span>
+      <button class="pq-kw-btn" data-idx="3" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅳ</span>성장과 육성</button>
+      <span class="pq-catalog-sep" aria-hidden="true">·</span>
+      <button class="pq-kw-btn" data-idx="4" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅴ</span>협업과 시너지</button>
+    </nav>
+
+    <!-- chapter buttons -->
+    <div class="pq-chapters">
+      <button class="pq-ch-btn" data-panel="bg">CH.1 추진 배경</button>
+      <button class="pq-ch-btn" data-panel="mech">CH.2 핵심 메커니즘</button>
+      <button class="pq-ch-btn" data-panel="reward">CH.3 활동 보상</button>
+    </div>
+
+    <div class="pq-meta">대상 : 전 임직원 · 2026. 07 — 11</div>
+
+    <a href="#" class="pq-cta">퀘스트 입장하기 <span aria-hidden="true" style="font-size:17px;line-height:1">→</span></a>
+
+  </div>
+
+  <!-- INFO PANEL OVERLAY -->
+  <div class="pq-overlay" id="pq-overlay" role="dialog" aria-modal="true">
+    <div class="pq-panel" id="pq-panel">
+      <button class="pq-close" id="pq-close" aria-label="닫기">✕</button>
+
+      <div class="pq-panel-content" id="pq-panel-bg">
+        <div class="pq-panel-eyebrow">CHAPTER 1 · BACKGROUND</div>
+        <h2 class="pq-panel-title" id="pq-panel-title">추진 배경</h2>
+        <p class="pq-bg-lead">우리는 HIGH-5 키워드가 '좋은 조직문화를 위해 갖춰야 할 가치'임을 충분히 알고 있습니다.</p>
+        <p class="pq-bg-body">하지만, 그 가치를 일하는 일상에 실천하기는 쉽지 않죠? 우리가 당연히 갖춰야 할 가치들을 일상에서 자유롭고 편안하게 기억하고 실천하기 위해 조직별 「온라인 워크숍」을 시행합니다.</p>
+        <p class="pq-bg-cta">즐겁게 참여해 주시기 바랍니다! 🙌</p>
+        <div class="pq-bg-meta">📅 2026. 7 ~ 11월 · 매월 1개 키워드 Open · 👥 전 임직원 대상</div>
+      </div>
+
+      <div class="pq-panel-content" id="pq-panel-mech">
+        <div class="pq-panel-eyebrow">CHAPTER 2 · MECHANISM</div>
+        <h2 class="pq-panel-title">핵심 메커니즘</h2>
+        <div class="pq-mech-steps">
+          <div class="pq-mech-step">
+            <div class="pq-step-num"><div class="pq-step-label">Step 1</div><div class="pq-step-arrow">↓</div></div>
+            <div><div class="pq-step-title">키워드 선택 &amp; 리더 메시지</div><div class="pq-step-sub">조직별 실천영역 선택 (Leader 3) 및 방향성 전달 (Leader 1·2·3)</div></div>
+          </div>
+          <div class="pq-mech-step">
+            <div class="pq-step-num"><div class="pq-step-label">Step 2</div><div class="pq-step-arrow">↓</div></div>
+            <div><div class="pq-step-title">구성원 토론 <span style="font-weight:500;color:rgba(234,227,210,.5)">제안·공감·투표</span></div><div class="pq-step-sub">더 나은 업무를 위한 구성원의 개선 제안·아이디어 제시</div></div>
+          </div>
+          <div class="pq-mech-step">
+            <div class="pq-step-num"><div class="pq-step-label">Step 3</div><div class="pq-step-arrow">↓</div></div>
+            <div><div class="pq-step-title">그라운드룰 확정</div><div class="pq-step-sub">상세 실천방안을 포함해 최종 결정 (Leader 3)</div></div>
+          </div>
+          <div class="pq-mech-step">
+            <div class="pq-step-num"><div class="pq-step-label">Step 4</div></div>
+            <div><div class="pq-step-title">실천 · 인증</div><div class="pq-step-sub">일상 업무에서 실제 실천하고 인증샷으로 증명</div></div>
+          </div>
+        </div>
+        <div class="pq-leader-box">
+          <div class="pq-leader-header">👥 리더 구분</div>
+          <div class="pq-leader-list">
+            <div><b class="pq-leader-tag">Leader 1</b> · 본부장 · 사업부장</div>
+            <div><b class="pq-leader-tag">Leader 2</b> · 실장 · PD · 담당 · 센터장</div>
+            <div><b class="pq-leader-tag">Leader 3</b> · 본사팀장 · 현장소장 <span style="color:rgba(234,227,210,.5)">(현장실장·단장·공구장)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pq-panel-content" id="pq-panel-reward">
+        <div class="pq-panel-eyebrow">CHAPTER 3 · REWARD</div>
+        <h2 class="pq-panel-title">활동 보상</h2>
+        <div class="pq-reward-cards">
+          <div class="pq-reward-card">
+            <div class="pq-reward-icon">📜</div>
+            <div class="pq-reward-card-title">조직 그라운드룰</div>
+            <div class="pq-reward-card-body">나의 의견이 곧 룰이 됩니다.<br>평소 변화시키고 싶은 조직의 모습을<br>우리 힘으로 만들어보세요!</div>
+          </div>
+          <div class="pq-reward-card">
+            <div class="pq-reward-p-icon" aria-label="포인트">P</div>
+            <div class="pq-reward-card-title">활동 포인트 적립</div>
+            <div class="pq-reward-card-body">나의 포인트가 현금이 됩니다.<br><span style="color:rgba(234,227,210,.5)">(랭킹 순위 진입 시)</span><br>이달의 미션을 모두 달성해보세요.<br>활동한 만큼 포인트가 누적됩니다.</div>
+          </div>
+          <div class="pq-reward-card">
+            <div class="pq-reward-icon">🏆</div>
+            <div class="pq-reward-card-title">우수 활동 보상</div>
+            <div class="pq-reward-card-body"><span class="pq-gold">매월 우수 활동자 포상</span><br>조직의 활동이 우수하면<br>더 큰 혜택이 있습니다 👍</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+(function(){
+  /* ── keyword data ── */
+  const KW=[
+    {name:'소통과 인정',  month:'7월',  msg:'폭넓게 정보를 공유하고 생각 차이를 인정합니다'},
+    {name:'존중과 배려',  month:'8월',  msg:'동등하게 존중하고 서로의 상황을 배려합니다'},
+    {name:'칭찬과 격려',  month:'9월',  msg:'실패를 격려하며 작은 성과와 노력도 칭찬합니다'},
+    {name:'성장과 육성',  month:'10월', msg:'실력을 키우고 역량을 발휘할 기회를 만듭니다'},
+    {name:'협업과 시너지',month:'11월', msg:'함께 해결책을 찾고 필요한 자원을 나누고 협력합니다'},
+  ];
+
+  let activeIdx=null, swapTimer=null;
+  const msgInner    =document.getElementById('pq-msg-inner');
+  const stateDefault=document.getElementById('pq-state-default');
+  const stateMsg    =document.getElementById('pq-state-msg');
+  const elMonth     =document.getElementById('pq-active-month');
+  const elName      =document.getElementById('pq-active-name');
+  const elMsg       =document.getElementById('pq-active-msg');
+  const kwLabel     =document.getElementById('pq-kw-label');
+  const kwHint      =document.getElementById('pq-kw-hint');
+  const kwBtns      =document.querySelectorAll('.pq-kw-btn');
+
+  function setMsg(idx){
+    msgInner.classList.replace('visible','hidden');
+    clearTimeout(swapTimer);
+    swapTimer=setTimeout(()=>{
+      activeIdx=idx;
+      if(idx===null){
+        stateDefault.style.display='';
+        stateMsg.style.display='none';
+      } else {
+        const k=KW[idx];
+        elMonth.textContent=k.month;
+        elName.textContent =k.name;
+        elMsg.textContent  =k.msg;
+        stateDefault.style.display='none';
+        stateMsg.style.display='';
+      }
+      kwBtns.forEach((b,i)=>b.setAttribute('aria-pressed',i===idx?'true':'false'));
+      msgInner.classList.replace('hidden','visible');
+    },200);
+  }
+
+  kwBtns.forEach(b=>b.addEventListener('click',()=>setMsg(activeIdx===+b.dataset.idx?null:+b.dataset.idx)));
+  [kwLabel,kwHint].forEach(el=>{
+    el.addEventListener('click',()=>setMsg(null));
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setMsg(null);}});
+  });
+
+  /* ── panel ── */
+  const overlay =document.getElementById('pq-overlay');
+  const closeBtn=document.getElementById('pq-close');
+  const PANELS  ={bg:'pq-panel-bg',mech:'pq-panel-mech',reward:'pq-panel-reward'};
+
+  function openPanel(key){
+    Object.values(PANELS).forEach(id=>document.getElementById(id).classList.toggle('active',id===PANELS[key]));
+    overlay.classList.add('open');
+    closeBtn.focus();
+    /* iframe 높이 자동 알림 */
+    notifyHeight();
+  }
+  function closePanel(){
+    overlay.classList.remove('open');
+    Object.values(PANELS).forEach(id=>document.getElementById(id).classList.remove('active'));
+  }
+
+  document.querySelectorAll('.pq-ch-btn').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));
+  closeBtn.addEventListener('click',closePanel);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closePanel();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))closePanel();});
+
+  /* ── title flash sync with shooting stars ── */
+  const titleWords=document.querySelectorAll('.pq-title-word');
+  function flashTitles(){
+    titleWords.forEach(w=>{
+      w.style.color='#F2EAFF';
+      w.style.textShadow='0 0 2px rgba(255,255,255,.5),0 0 18px rgba(200,170,255,.7),0 0 42px rgba(160,130,245,.5)';
+    });
+    setTimeout(()=>titleWords.forEach(w=>{w.style.color='';w.style.textShadow='';}),320);
+  }
+  function scheduleFlash(delay,period){
+    setTimeout(function loop(){flashTitles();setTimeout(loop,period);},delay);
+  }
+  scheduleFlash(1760,11000);
+  scheduleFlash(7260,11000);
+
+  /* ── postMessage: iframe 높이를 부모에게 전달 ── */
+  function notifyHeight(){
+    const h=document.getElementById('pq-shell').scrollHeight;
+    try{ window.parent.postMessage({type:'pq-resize',height:h},'*'); }catch(e){}
+  }
+  /* 초기 로드 후 + 리사이즈 시 높이 전달 */
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
+  if(typeof ResizeObserver!=='undefined'){
+    new ResizeObserver(notifyHeight).observe(document.getElementById('pq-shell'));
+  }
+})();
+</script>
+</body>
+</html>
