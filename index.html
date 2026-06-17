@@ -28,7 +28,6 @@
   @keyframes pq-flick       { 0%,100%{opacity:.4;} 50%{opacity:.9;} }
   @keyframes pq-bounce      { 0%,100%{transform:translateY(0);} 50%{transform:translateY(7px);} }
   @keyframes pq-kw-glow     { 0%,100%{text-shadow:0 0 10px rgba(224,180,255,.55);} 50%{text-shadow:0 0 20px rgba(224,180,255,.95),0 0 34px rgba(180,150,255,.6);} }
-  @keyframes pq-cta-pulse   { 0%,100%{box-shadow:0 8px 28px -8px rgba(150,110,235,.7),inset 0 1px 0 rgba(255,255,255,.25);} 50%{box-shadow:0 12px 40px -6px rgba(170,123,234,.95),0 0 20px rgba(150,110,235,.5),inset 0 1px 0 rgba(255,255,255,.3);} }
   @keyframes pq-panel-in    { from{opacity:0;transform:scale(.97);} to{opacity:1;transform:scale(1);} }
 
   @keyframes pq-shoot-dl {
@@ -209,48 +208,47 @@
   /* ─── meta ─── */
   .pq-meta { margin-top:18px; font-size:10px; letter-spacing:.2em; color:rgba(234,227,210,.38); text-align:center; }
 
-  /* ─── CTA ─── */
-  .pq-cta {
-    margin-top:18px;
-    display:inline-flex; align-items:center; gap:9px;
-    padding:13px 36px; border-radius:999px;
-    font-family:'Pretendard Variable','Pretendard',sans-serif;
-    font-size:clamp(14px,1.8vw,16px); font-weight:800; letter-spacing:.01em;
-    color:#fff; text-decoration:none;
-    background:linear-gradient(100deg,#7C5CD6,#A77BEA 50%,#6E8CE0);
-    border:1px solid rgba(214,190,255,.6);
-    animation:pq-cta-pulse 2.6s ease-in-out infinite;
-    transition:transform .2s;
+  /* ─── 7/6 START badge ─── */
+  .pq-start-badge {
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(13px, 1.8vw, 17px);
+    font-weight: 700;
+    letter-spacing: .28em;
+    color: #FFD400;
+    text-shadow: 0 0 14px rgba(255,212,0,.65), 0 0 30px rgba(255,212,0,.3);
+    animation: pq-flick 3.2s ease-in-out infinite;
   }
-  .pq-cta:hover { transform:translateY(-2px); }
 
-  /* ─── info panel overlay ─── */
-  .pq-overlay {
-    display:none; position:fixed; inset:0; z-index:60;
-    align-items:center; justify-content:center;
-    padding:20px;
-    background:rgba(6,5,10,.85);
-    overflow-y:auto;
+  /* ─── ch panel: 버튼 아래 슬라이드 패널 ─── */
+  .pq-ch-btn.active {
+    background: rgba(170,140,250,.28);
+    border-color: rgba(214,190,255,.85);
+    box-shadow: 0 0 0 2px rgba(186,160,255,.3), 0 8px 24px -8px rgba(160,120,245,.8), inset 0 1px 0 rgba(255,255,255,.18);
   }
-  .pq-overlay.open { display:flex; }
-  .pq-panel {
-    position:relative; width:min(640px,100%);
-    border-radius:4px; padding:28px 24px 26px;
-    background:#141118;
-    border:1px solid rgba(234,227,210,.26);
-    box-shadow:0 32px 80px -24px rgba(0,0,0,.9);
-    animation:pq-panel-in .22s ease;
-    max-height:85vh; overflow-y:auto;
+  .pq-ch-panel-wrap {
+    width: min(680px, 90%);
+    overflow: hidden;
+    height: 0;
+    transition: height .4s cubic-bezier(.4,0,.2,1);
+    position: relative; z-index: 4;
   }
-  .pq-close {
-    position:sticky; top:0; float:right; clear:right;
-    width:28px; height:28px; border-radius:2px;
-    border:1px solid rgba(234,227,210,.28);
-    background:rgba(20,17,24,.9); color:#EAE3D2;
-    cursor:pointer; font-size:13px;
-    display:flex; align-items:center; justify-content:center;
-    z-index:1;
+  .pq-ch-panel-inner {
+    padding: 22px 24px 24px;
+    background: rgba(20,17,24,.92);
+    border: 1px solid rgba(186,160,255,.32);
+    border-radius: 10px;
+    margin-top: 10px;
+    /* fade-in when opened */
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .3s .1s ease, transform .3s .1s ease;
   }
+  .pq-ch-panel-wrap.open .pq-ch-panel-inner {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .pq-panel-eyebrow { font-size:10px; letter-spacing:.26em; color:#C8924E; }
   .pq-panel-title   { margin:6px 0 0; font-family:'Pretendard Variable','Pretendard',sans-serif; font-weight:700; font-size:22px; color:#EAE3D2; letter-spacing:-.01em; }
 
@@ -279,8 +277,6 @@
   .pq-reward-card-body  { font-size:10px; color:rgba(234,227,210,.64); margin-top:7px; line-height:1.8; }
   .pq-gold { color:#F2D98A; font-weight:700; }
 
-  .pq-panel-content { display:none; }
-  .pq-panel-content.active { display:block; }
 
   /* ─── mobile breakpoints ─── */
   @media (max-width: 480px) {
@@ -288,7 +284,6 @@
     .pq-vtext   { display:none; }  /* 좌우 세로 텍스트 숨김 - 모바일 공간 확보 */
     .pq-border-left, .pq-border-right { width:16px; }
     .pq-reward-cards { flex-direction:column; }
-    .pq-panel { padding:22px 16px 20px; }
     .pq-chapters { gap:8px; }
     .pq-ch-btn  { font-size:11px; padding:10px 14px; }
     .pq-kw-btn  { font-size:12px; padding:5px 7px; }
@@ -355,6 +350,7 @@
       <div class="pq-title-glow" aria-hidden="true"></div>
       <div class="pq-title-word">컬처</div>
       <div class="pq-title-word">퀘스트</div>
+      <div class="pq-start-badge" aria-label="7월 6일 시작">7월 6일 START!!</div>
     </div>
 
     <!-- message zone -->
@@ -392,34 +388,35 @@
       <button class="pq-kw-btn" data-idx="4" aria-pressed="false"><span class="pq-kw-numeral" aria-hidden="true">Ⅴ</span>협업과 시너지</button>
     </nav>
 
-    <!-- chapter buttons -->
+    <!-- chapter buttons (원래 3버튼 형태 유지) -->
     <div class="pq-chapters">
-      <button class="pq-ch-btn" data-panel="bg">CH.1 추진 배경</button>
-      <button class="pq-ch-btn" data-panel="mech">CH.2 핵심 메커니즘</button>
-      <button class="pq-ch-btn" data-panel="reward">CH.3 활동 보상</button>
+      <button class="pq-ch-btn" data-ch="bg">CH.1 추진 배경</button>
+      <button class="pq-ch-btn" data-ch="mech">CH.2 핵심 메커니즘</button>
+      <button class="pq-ch-btn" data-ch="reward">CH.3 활동 보상</button>
     </div>
 
     <div class="pq-meta">대상 : 전 임직원 · 2026. 07 — 11</div>
 
-    <a href="#" class="pq-cta">퀘스트 입장하기 <span aria-hidden="true" style="font-size:17px;line-height:1">→</span></a>
+  </div><!-- /content -->
 
-  </div>
+  <!-- ── CH 슬라이드 패널들: 버튼 아래 동일 페이지에 표시 ── -->
+  <div style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:4;">
 
-  <!-- INFO PANEL OVERLAY -->
-  <div class="pq-overlay" id="pq-overlay" role="dialog" aria-modal="true">
-    <div class="pq-panel" id="pq-panel">
-      <button class="pq-close" id="pq-close" aria-label="닫기">✕</button>
-
-      <div class="pq-panel-content" id="pq-panel-bg">
+    <!-- CH.1 추진 배경 -->
+    <div class="pq-ch-panel-wrap" id="panel-bg">
+      <div class="pq-ch-panel-inner">
         <div class="pq-panel-eyebrow">CHAPTER 1 · BACKGROUND</div>
-        <h2 class="pq-panel-title" id="pq-panel-title">추진 배경</h2>
+        <h2 class="pq-panel-title">추진 배경</h2>
         <p class="pq-bg-lead">우리는 HIGH-5 키워드가 '좋은 조직문화를 위해 갖춰야 할 가치'임을 충분히 알고 있습니다.</p>
         <p class="pq-bg-body">하지만, 그 가치를 일하는 일상에 실천하기는 쉽지 않죠? 우리가 당연히 갖춰야 할 가치들을 일상에서 자유롭고 편안하게 기억하고 실천하기 위해 조직별 「온라인 워크숍」을 시행합니다.</p>
         <p class="pq-bg-cta">즐겁게 참여해 주시기 바랍니다! 🙌</p>
         <div class="pq-bg-meta">📅 2026. 7 ~ 11월 · 매월 1개 키워드 Open · 👥 전 임직원 대상</div>
       </div>
+    </div>
 
-      <div class="pq-panel-content" id="pq-panel-mech">
+    <!-- CH.2 핵심 메커니즘 -->
+    <div class="pq-ch-panel-wrap" id="panel-mech">
+      <div class="pq-ch-panel-inner">
         <div class="pq-panel-eyebrow">CHAPTER 2 · MECHANISM</div>
         <h2 class="pq-panel-title">핵심 메커니즘</h2>
         <div class="pq-mech-steps">
@@ -449,8 +446,11 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="pq-panel-content" id="pq-panel-reward">
+    <!-- CH.3 활동 보상 -->
+    <div class="pq-ch-panel-wrap" id="panel-reward">
+      <div class="pq-ch-panel-inner">
         <div class="pq-panel-eyebrow">CHAPTER 3 · REWARD</div>
         <h2 class="pq-panel-title">활동 보상</h2>
         <div class="pq-reward-cards">
@@ -471,9 +471,12 @@
           </div>
         </div>
       </div>
-
     </div>
-  </div>
+
+  </div><!-- /panels -->
+
+  <!-- bottom padding -->
+  <div style="height:40px"></div>
 
 </div><!-- /shell -->
 
@@ -526,27 +529,50 @@
     el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setMsg(null);}});
   });
 
-  /* ── panel ── */
-  const overlay =document.getElementById('pq-overlay');
-  const closeBtn=document.getElementById('pq-close');
-  const PANELS  ={bg:'pq-panel-bg',mech:'pq-panel-mech',reward:'pq-panel-reward'};
+  /* ── ch panel 슬라이드 ── */
+  const CH_MAP = { bg:'panel-bg', mech:'panel-mech', reward:'panel-reward' };
+  let activeCh = null;
 
-  function openPanel(key){
-    Object.values(PANELS).forEach(id=>document.getElementById(id).classList.toggle('active',id===PANELS[key]));
-    overlay.classList.add('open');
-    closeBtn.focus();
-    /* iframe 높이 자동 알림 */
+  function openCh(key) {
+    // 모든 패널 닫기 + 버튼 active 해제
+    document.querySelectorAll('.pq-ch-panel-wrap').forEach(w => {
+      w.classList.remove('open');
+      w.style.height = '0';
+    });
+    document.querySelectorAll('.pq-ch-btn').forEach(b => b.classList.remove('active'));
+
+    if (key === activeCh) {
+      // 같은 버튼 재클릭 → 닫기
+      activeCh = null;
+      notifyHeight();
+      return;
+    }
+
+    activeCh = key;
+    const wrap  = document.getElementById(CH_MAP[key]);
+    const inner = wrap.querySelector('.pq-ch-panel-inner');
+
+    // 버튼 active 표시
+    document.querySelector(`.pq-ch-btn[data-ch="${key}"]`).classList.add('active');
+
+    // 높이 측정 후 슬라이드 다운
+    wrap.style.height = '0';
+    wrap.classList.add('open');
+    requestAnimationFrame(() => {
+      wrap.style.height = inner.offsetHeight + 'px';
+    });
+
+    // 패널이 열리면 뷰포트에 부드럽게 스크롤
+    setTimeout(() => {
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      notifyHeight();
+    }, 420);
     notifyHeight();
   }
-  function closePanel(){
-    overlay.classList.remove('open');
-    Object.values(PANELS).forEach(id=>document.getElementById(id).classList.remove('active'));
-  }
 
-  document.querySelectorAll('.pq-ch-btn').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));
-  closeBtn.addEventListener('click',closePanel);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)closePanel();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))closePanel();});
+  document.querySelectorAll('.pq-ch-btn').forEach(btn => {
+    btn.addEventListener('click', () => openCh(btn.dataset.ch));
+  });
 
   /* ── title flash sync with shooting stars ── */
   const titleWords=document.querySelectorAll('.pq-title-word');
