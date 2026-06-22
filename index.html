@@ -201,7 +201,7 @@
   .pq-kw-numeral { color:rgba(242,217,138,.7); margin-right:4px; }
 
   /* ─── chapter buttons ─── */
-  .pq-chapters { margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .pq-chapters { margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; }
   .pq-ch-btn {
     font-family:inherit; font-size:clamp(11px,1.4vw,13.5px); letter-spacing:.07em; font-weight:700;
     color:#EAE3D2;
@@ -292,6 +292,34 @@
   .pq-reward-row .pq-reward-p-icon { margin:0; flex-shrink:0; }
   .pq-reward-icon-box { flex-shrink:0; width:26px; text-align:center; font-size:22px; line-height:1.2; }
   .pq-reward-row-text { font-size:15px; line-height:1.7; color:rgba(234,227,210,.82); }
+
+  /* 대상 조직 버튼 + 슬라이드 안내 */
+  .pq-reward-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  .pq-reward-head .pq-panel-title { margin:0; }
+  .pq-target-btn {
+    font-family:'Pretendard Variable','Pretendard',sans-serif;
+    font-size:12.5px; font-weight:700; color:#EAE3D2; letter-spacing:.02em;
+    background:rgba(200,146,78,.14); border:1px solid rgba(200,146,78,.5);
+    border-radius:40px; padding:5px 13px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:background .2s, border-color .2s; white-space:nowrap;
+  }
+  .pq-target-btn:hover { background:rgba(200,146,78,.26); border-color:#C8924E; }
+  .pq-target-btn .pq-target-dot { color:#C8924E; font-size:7px; }
+  .pq-target-btn .pq-target-caret { color:#C8924E; font-size:10px; transition:transform .25s; }
+  .pq-target-btn.open .pq-target-caret { transform:rotate(180deg); }
+  .pq-target-inner {
+    margin-top:12px; padding:14px 16px;
+    border:1px solid rgba(200,146,78,.32); border-left:3px solid #C8924E; border-radius:4px;
+    background:rgba(200,146,78,.07);
+    font-family:'Pretendard Variable','Pretendard',sans-serif;
+  }
+  .pq-target-row { font-size:14.5px; color:#EAE3D2; line-height:1.85; }
+  .pq-target-row b { color:#F2D98A; font-weight:800; }
+  .pq-target-note {
+    margin-top:9px; padding-top:10px; border-top:1px dashed rgba(234,227,210,.2);
+    font-size:13px; color:rgba(234,227,210,.74); line-height:1.7;
+  }
   .pq-reward-dim { color:rgba(234,227,210,.55); }
 
 
@@ -411,6 +439,9 @@
       <button class="pq-ch-btn" data-ch="bg">CH.1 추진 배경</button>
       <button class="pq-ch-btn" data-ch="mech">CH.2 핵심 메커니즘</button>
       <button class="pq-ch-btn" data-ch="reward">CH.3 활동 보상</button>
+      <button class="pq-target-btn" id="pq-target-btn" type="button" aria-expanded="false" aria-controls="panel-target">
+        <span class="pq-target-dot" aria-hidden="true">●</span> 대상 조직 <span class="pq-target-caret" aria-hidden="true">▾</span>
+      </button>
     </div>
 
     </div><!-- /content -->
@@ -469,9 +500,22 @@
             </div>
             <div class="pq-reward-row">
               <div class="pq-reward-icon-box" aria-hidden="true">🏆</div>
-              <div class="pq-reward-row-text"><span class="pq-gold">◆ 우수 활동자</span> : 랭킹 순위 진입 시 포인트 현금화 <span class="pq-reward-dim">(매월)</span><br><span class="pq-gold">◆ 우수 활동 조직</span> : 5개월 평균 조직포인트 우수 팀/현장 포상금 수여</div>
+              <div class="pq-reward-row-text"><span class="pq-gold">◆ 우수 활동자</span> : 활동 실적 랭킹 우수자 포상 <span class="pq-reward-dim">(월 기준)</span><br><span class="pq-gold">◆ 우수 활동 조직</span> : 5개월 평균 조직 포인트 우수 본사팀/현장 포상</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 대상 조직 (활동 보상과 독립된 패널) -->
+    <div class="pq-ch-panel-wrap" id="panel-target">
+      <div class="pq-ch-panel-inner">
+        <div class="pq-panel-eyebrow">TARGET · 참여 대상</div>
+        <h2 class="pq-panel-title">대상 조직</h2>
+        <div class="pq-target-inner" style="margin-top:14px">
+          <div class="pq-target-row">· 팀원수 <b>4인 이상</b> 본사팀 / 현장</div>
+          <div class="pq-target-row">· 본사팀장 · 현장소장 <b>부재 시 참여 불가</b></div>
+          <div class="pq-target-note">※ 조직인원 변경, 준공임박 등 이슈가 있을 경우 문의 &nbsp;☏ 컬처디자인랩 김현지 책임</div>
         </div>
       </div>
     </div>
@@ -533,7 +577,7 @@
   });
 
   /* ── ch panel 슬라이드 ── */
-  const CH_MAP = { bg:'panel-bg', mech:'panel-mech', reward:'panel-reward' };
+  const CH_MAP = { bg:'panel-bg', mech:'panel-mech', reward:'panel-reward', target:'panel-target' };
   let activeCh = null;
 
   function openCh(key) {
@@ -543,6 +587,7 @@
       w.style.height = '0';
     });
     document.querySelectorAll('.pq-ch-btn').forEach(b => b.classList.remove('active'));
+    resetTarget();  // 챕터 전환 시 대상 조직 안내도 접기
 
     if (key === activeCh) {
       // 같은 버튼 재클릭 → 닫기
@@ -555,8 +600,13 @@
     const wrap  = document.getElementById(CH_MAP[key]);
     const inner = wrap.querySelector('.pq-ch-panel-inner');
 
-    // 버튼 active 표시
-    document.querySelector(`.pq-ch-btn[data-ch="${key}"]`).classList.add('active');
+    // 활성 버튼 표시 (대상 조직은 별도 버튼)
+    if (key === 'target') {
+      if (tgtBtn) { tgtBtn.classList.add('open'); tgtBtn.setAttribute('aria-expanded','true'); }
+    } else {
+      const chBtn = document.querySelector(`.pq-ch-btn[data-ch="${key}"]`);
+      if (chBtn) chBtn.classList.add('active');
+    }
 
     // 높이 측정 후 슬라이드 다운
     wrap.style.height = '0';
@@ -576,6 +626,19 @@
   document.querySelectorAll('.pq-ch-btn').forEach(btn => {
     btn.addEventListener('click', () => openCh(btn.dataset.ch));
   });
+
+  /* ── 대상 조직: 활동 보상과 독립된 패널 토글 ── */
+  const tgtBtn = document.getElementById('pq-target-btn');
+
+  function resetTarget(){
+    if(!tgtBtn) return;
+    tgtBtn.classList.remove('open');
+    tgtBtn.setAttribute('aria-expanded','false');
+  }
+
+  if (tgtBtn) {
+    tgtBtn.addEventListener('click', () => openCh('target'));
+  }
 
   /* ── title flash sync with shooting stars ── */
   const titleWords=document.querySelectorAll('.pq-title-word');
