@@ -215,20 +215,18 @@
   }
   .pq-catalog-sep { display:none; }
   .pq-kw-btn {
-    background:rgba(242,217,138,.1); border:1px solid rgba(242,217,138,.32);
+    background:transparent; border:1px solid rgba(242,217,138,.16);
     border-radius:40px; cursor:pointer;
     font-family:inherit; font-size:clamp(12px,1.5vw,15px); font-weight:700;
     letter-spacing:0; white-space:nowrap;
     color:#F2D98A; padding:7px 14px;
-    transition:color .2s,transform .2s,background .2s,border-color .2s,box-shadow .2s;
-    animation:pq-kw-invite 2.6s ease-in-out infinite;
+    transition:color .2s,transform .2s,background .2s,border-color .2s;
   }
   .pq-kw-btn:hover, .pq-kw-btn:focus-visible,
   .pq-kw-btn[aria-pressed="true"] {
-    color:#FFF0C4; background:rgba(242,217,138,.1);
-    border-color:#F2D98A; transform:scale(1.07);
-    box-shadow:0 0 10px rgba(242,217,138,.22);
-    animation:none; outline:none;
+    color:#FFF0C4; background:rgba(242,217,138,.07);
+    border-color:rgba(242,217,138,.42); transform:scale(1.06);
+    outline:none;
   }
   .pq-kw-numeral { color:rgba(242,217,138,.7); margin-right:4px; }
 
